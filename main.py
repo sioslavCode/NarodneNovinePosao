@@ -1,4 +1,6 @@
+import os
 import time
+from email.message import EmailMessage
 from random import randint
 
 from selenium import webdriver
@@ -53,8 +55,8 @@ for element in div_element_list:
 # Odi na svaki od linkova u listi i otvori ga
 
 for jedna_objava in lista_objava:
-    if lista_objava.index(jedna_objava) is 4: break #Ovo sluzi smao za tesitanje tj da prestane radit nakon 5 puta
-    time.sleep(randint(5, 8))
+    # if lista_objava.index(jedna_objava) == 8: break #Ovo sluzi smao za tesitanje tj da prestane radit nakon 5 puta
+    time.sleep(randint(10, 15))
     driver.get(jedna_objava.link)
     print(f"Otvaram: {jedna_objava.link}")
     # preuzmi sadzraj tog div elemnta
@@ -62,19 +64,41 @@ for jedna_objava in lista_objava:
 
     # Provjeri sadrži li sadržaj ključne rijeci
 
-    kljucna_rijec = "pravnik"
+    kljucna_rijec = "pravn"
 
     if kljucna_rijec in sadrzaj.text:
         objave_s_kljucnim_rijecima.append(jedna_objava)
 
 # Ako ima dodaj ga u poruku
 
+poruka = ""
 for objava_kljucna in objave_s_kljucnim_rijecima:
     print(f"U teksu naslova: {objava_kljucna.naslov}, link: {objava_kljucna.link} nalazi se ključna riječ: {kljucna_rijec}")
+    poruka = poruka + "Naslov: " + objava_kljucna.naslov + "<br>" + objava_kljucna.link + "<br>"
 
 # Zamjeni dio porkue sa <mark> da se vide kljucne rijeci žutom bojom
 
 
 # Pošalji email poruku
+
+
+EMAIL_ADRESS = os.environ.get("python_user")
+EMAIL_PASSWORD = os.environ.get("python_password")
+
+msg = EmailMessage()
+msg["Subject"] = "Narodne Novine posao objava"
+msg["From"] = EMAIL_ADRESS
+msg["To"] = EMAIL_ADRESS
+msg.set_content(poruka)
+
+msg.add_alternative(
+    "<html><body><h1>Narodne Novine posao objava</h1></body>" + poruka +
+    "</html>",
+    subtype="html")
+
+with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+    smtp.login(EMAIL_ADRESS, EMAIL_PASSWORD)
+
+    smtp.send_message(msg)
 
 driver.close()
