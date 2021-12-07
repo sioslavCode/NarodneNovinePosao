@@ -1,4 +1,5 @@
 import time
+from random import randint
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,6 +19,15 @@ driver = webdriver.Chrome(
     service=service,
     options=chrome_options
 )
+lista_objava = []
+objave_s_kljucnim_rijecima = []
+
+
+class objava:
+    def __init__(self, naslov, link):
+        self.naslov = naslov
+        self.link = link
+
 
 driver.get(url)
 print("Otvorio stranicu")
@@ -35,25 +45,32 @@ except NoSuchElementException:
 for element in div_element_list:
     naslov = element.text
     link = element.find_element(By.TAG_NAME, "a").get_attribute("href")
+
+    lista_objava.append(objava(naslov, link))
     print(naslov)
     print(link)
 
 # Odi na svaki od linkova u listi i otvori ga
 
-# NE ZABORAVI STAVITI RANDOM SLEEP IZMEDU SVAKOG UPITA OTVARANJE LINKA DA NEBI BIO ROBOT
+for jedna_objava in lista_objava:
+    if lista_objava.index(jedna_objava) is 4: break #Ovo sluzi smao za tesitanje tj da prestane radit nakon 5 puta
+    time.sleep(randint(5, 8))
+    driver.get(jedna_objava.link)
+    print(f"Otvaram: {jedna_objava.link}")
+    # preuzmi sadzraj tog div elemnta
+    sadrzaj = driver.find_element(By.ID, "html-content-frame")
 
-url_oglasa = "https://narodne-novine.nn.hr/clanci/oglasi/o8327312.html"
-driver.get(url_oglasa)
+    # Provjeri sadrži li sadržaj ključne rijeci
 
-sadrzaj = driver.find_element(By.ID, "html-content-frame")
-print("Sadržaj objave:" + "\n")
-print(sadrzaj.text)
+    kljucna_rijec = "pravnik"
 
-# Provjeri sadrži li sadržaj ključne rijeci
-
+    if kljucna_rijec in sadrzaj.text:
+        objave_s_kljucnim_rijecima.append(jedna_objava)
 
 # Ako ima dodaj ga u poruku
 
+for objava_kljucna in objave_s_kljucnim_rijecima:
+    print(f"U teksu naslova: {objava_kljucna.naslov}, link: {objava_kljucna.link} nalazi se ključna riječ: {kljucna_rijec}")
 
 # Zamjeni dio porkue sa <mark> da se vide kljucne rijeci žutom bojom
 
