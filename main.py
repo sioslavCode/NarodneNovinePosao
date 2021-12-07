@@ -39,6 +39,7 @@ time.sleep(3)
 
 # Lista evih div elementa koji su sebi sadrze naslov i link
 
+poruka = ""
 try:
     div_element_list = driver.find_elements(By.CLASS_NAME, "resultTitle")
 except NoSuchElementException:
@@ -71,9 +72,9 @@ for jedna_objava in lista_objava:
 
 # Ako ima dodaj ga u poruku
 
-poruka = ""
 for objava_kljucna in objave_s_kljucnim_rijecima:
-    print(f"U teksu naslova: {objava_kljucna.naslov}, link: {objava_kljucna.link} nalazi se ključna riječ: {kljucna_rijec}")
+    print(
+        f"U teksu naslova: {objava_kljucna.naslov}, link: {objava_kljucna.link} nalazi se ključna riječ: {kljucna_rijec}")
     poruka = poruka + "Naslov: " + objava_kljucna.naslov + "<br>" + objava_kljucna.link + "<br>"
 
 # Zamjeni dio porkue sa <mark> da se vide kljucne rijeci žutom bojom
